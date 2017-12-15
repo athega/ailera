@@ -11,13 +11,21 @@ import (
 )
 
 func main() {
+	logger := log.New(os.Stdout, "", 0)
+
+	addr, s := setup(logger)
+
+	logger.Printf("Listening on http://localhost%s\n", addr)
+
+	http.ListenAndServe(addr, s)
+}
+
+func setup(logger *log.Logger) (string, *server.Server) {
 	var addr = ":3000"
 
 	if port := os.Getenv("PORT"); port != "" {
 		addr = ":" + port
 	}
-
-	logger := log.New(os.Stdout, "", 0)
 
 	connConfig, err := pgx.ParseConnectionString(os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -32,9 +40,5 @@ func main() {
 		log.Fatalf("Unable to create connection pool: %v\n", err)
 	}
 
-	s := server.NewServer(logger, pool)
-
-	logger.Printf("Listening on http://localhost%s\n", addr)
-
-	http.ListenAndServe(addr, s)
+	return addr, server.NewServer(logger, pool)
 }
