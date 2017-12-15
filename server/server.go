@@ -40,6 +40,8 @@ func (s *Server) get(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/api/v1/db":
 		s.db(w, r)
+	case "/api/v1/codes":
+		s.db(w, r)
 	default:
 		w.Write([]byte("FlockFlow"))
 	}
@@ -76,6 +78,35 @@ func (s *Server) db(w http.ResponseWriter, r *http.Request) {
 		Meta: makeMeta(r, time.Now()),
 		Data: data,
 	})
+}
+
+func (s *Server) codes(w http.ResponseWriter, r *http.Request) {
+    sql := `UPDATE code SET used = TRUE WHERE id IN (SELECT id FROM code WHERE used = FALSE LIMIT 1) RETURNING code`
+
+    rows, err := s.pool.Query(sql)
+    if err != nil {
+        http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+        return
+    }
+
+    data := []Data{}
+
+    for rows.Next() {
+        if values, err := rows.Values(); err == nil {
+            data = append(data, Data{
+                "idcode":   values[0],
+            })
+        }
+    }
+
+    w.Header().Add("Content-Type", "application/json")
+
+    enc := json.NewEncoder(w)
+    enc.SetIndent("", "  ")
+    enc.Encode(ListResponse{
+        Meta: makeMeta(r, time.Now()),
+        Data: data,
+    })
 }
 
 func (s *Server) log(format string, v ...interface{}) {
