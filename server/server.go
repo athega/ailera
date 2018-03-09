@@ -11,12 +11,14 @@ import (
 )
 
 var (
-	errHTTPSRequired   = errors.New("HTTPS required")
-	errUnknownKey      = errors.New("unknown key")
-	errUnknownEndpoint = errors.New("unknown endpoint")
+	errHTTPSRequired    = errors.New("HTTPS required")
+	errUnknownKey       = errors.New("unknown key")
+	errUnknownEndpoint  = errors.New("unknown endpoint")
+	errInvalidJWT       = errors.New("invalid JWT")
+	errInvalidJWTClaims = errors.New("invalid JWT claims")
 )
 
-func New(logger *log.Logger, secretKey string) *Server {
+func New(logger *log.Logger, secretKey []byte) *Server {
 	return &Server{
 		logger:    logger,
 		secretKey: secretKey,
@@ -25,7 +27,7 @@ func New(logger *log.Logger, secretKey string) *Server {
 
 type Server struct {
 	logger    *log.Logger
-	secretKey string
+	secretKey []byte
 	timeNow   func() time.Time
 }
 
@@ -49,6 +51,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		s.post(w, r)
 	}
+}
+
+func (s *Server) keyFunc(token *jwt.Token) (interface{}, error) {
+	return s.secretKey, nil
 }
 
 func (s *Server) signedString(sub string) (string, error) {

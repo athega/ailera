@@ -14,10 +14,11 @@ import (
 
 const (
 	defaultPort              = "3000"
-	defaultSecretKey         = "secret"
 	defaultReadTimeout       = 20 * time.Second
 	defaultReadHeaderTimeout = 10 * time.Second
 )
+
+var defaultSecretKey = []byte("secret")
 
 func main() {
 	logger := log.New(os.Stdout, "", 0)
@@ -28,7 +29,7 @@ func main() {
 func setup(logger *log.Logger, e env.Client) *http.Server {
 	return &http.Server{
 		Addr:              ":" + e.String("PORT", defaultPort),
-		Handler:           server.New(logger, e.String("SECRET_KEY", defaultSecretKey)),
+		Handler:           server.New(logger, e.Bytes("SECRET_KEY", defaultSecretKey)),
 		ReadTimeout:       e.Duration("READ_TIMEOUT", defaultReadTimeout),
 		ReadHeaderTimeout: e.Duration("READ_HEADER_TIMEOUT", defaultReadHeaderTimeout),
 	}
