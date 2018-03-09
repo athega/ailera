@@ -33,7 +33,7 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims, ok := token.Claims.(*jwt.StandardClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		writeError(w, r, errInvalidJWTClaims, http.StatusBadRequest, meta)
 		return
