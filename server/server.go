@@ -56,7 +56,7 @@ func (s *Server) signedString(sub string) (string, error) {
 		Issuer:   "flockflow",
 		IssuedAt: jwt.TimeFunc().Unix(),
 		Subject:  sub,
-	}).SignedString(s.secretKey)
+	}).SignedString([]byte(s.secretKey))
 }
 
 func (s *Server) now() time.Time {
