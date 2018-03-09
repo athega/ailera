@@ -15,13 +15,16 @@
 
 [[projects]]
   name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
+  packages = [
+    ".",
+    "request"
+  ]
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
   version = "v3.2.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "64fd3a75d8a99cc4150cf89d0409db4c6c20ca13bf6e94115f63839ecba9e994"
+  inputs-digest = "2c7051151a6782747f1604413840e2b7dea92f096437e04acf574354028ecc0c"
   solver-name = "gps-cdcl"
   solver-version = 1
