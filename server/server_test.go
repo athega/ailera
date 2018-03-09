@@ -7,8 +7,10 @@ import (
 	"testing"
 )
 
+var testSecretKey = []byte("testsecret")
+
 func TestNew(t *testing.T) {
-	if got := New(nil, "testsecret"); got == nil {
+	if got := New(nil, testSecretKey); got == nil {
 		t.Fatal("New returned nil")
 	}
 }
@@ -18,7 +20,7 @@ func TestServeHTTP(t *testing.T) {
 
 	logger := log.New(&buf, "", 0)
 
-	s := New(logger, "testsecret")
+	s := New(logger, testSecretKey)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "http://example.org/", nil)
