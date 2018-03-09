@@ -9,6 +9,7 @@ import (
 
 var hardcodedProfiles = map[string]Profile{
 	"5678": Profile{
+		ID:    "5678",
 		Name:  "Foo Bar",
 		Email: "foo.bar@example.com",
 		Link:  "http://example.com/",
