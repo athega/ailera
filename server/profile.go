@@ -7,28 +7,12 @@ import (
 	request "github.com/dgrijalva/jwt-go/request"
 )
 
-type Profile struct {
-	ID    string
-	Name  string
-	Phone string
-	URL   string
-}
-
-func (p Profile) Data() Data {
-	return Data{
-		"id":    p.ID,
-		"name":  p.Name,
-		"phone": p.Phone,
-		"url":   p.URL,
-	}
-}
-
 var hardcodedProfiles = map[string]Profile{
 	"5678": Profile{
-		ID:    "5678",
 		Name:  "Foo Bar",
+		Email: "foo.bar@example.com",
+		Link:  "http://example.com/",
 		Phone: "012345678",
-		URL:   "http://example.com/",
 	},
 }
 
@@ -56,4 +40,22 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 		Meta: meta,
 		Data: profile.Data(),
 	})
+}
+
+type Profile struct {
+	ID    string
+	Name  string
+	Email string
+	Link  string
+	Phone string
+}
+
+func (p Profile) Data() Data {
+	return Data{
+		"id":    p.ID,
+		"name":  p.Name,
+		"email": p.Email,
+		"link":  p.Link,
+		"phone": p.Phone,
+	}
 }
