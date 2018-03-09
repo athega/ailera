@@ -3,9 +3,16 @@
 
 [[projects]]
   name = "github.com/jackc/pgx"
-  packages = [".","chunkreader","internal/sanitize","pgio","pgproto3","pgtype"]
-  revision = "66918e80dfde8d5cb09af9aebf40e2cce2eb0cc0"
-  version = "v3.0.1"
+  packages = [
+    ".",
+    "chunkreader",
+    "internal/sanitize",
+    "pgio",
+    "pgproto3",
+    "pgtype"
+  ]
+  revision = "da3231b0b66e2e74cdb779f1d46c5e958ba8be27"
+  version = "v3.1.0"
 
 [[projects]]
   name = "github.com/pkg/errors"

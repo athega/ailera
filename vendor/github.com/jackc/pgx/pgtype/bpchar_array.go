@@ -1,52 +1,58 @@
 package pgtype
 
 import (
-	"bytes"
-	"fmt"
-	"io"
+	"database/sql/driver"
+	"encoding/binary"
 
 	"github.com/jackc/pgx/pgio"
+	"github.com/pkg/errors"
 )
 
-type <%= pgtype_array_type %> struct {
-	Elements   []<%= pgtype_element_type %>
+type BPCharArray struct {
+	Elements   []BPChar
 	Dimensions []ArrayDimension
 	Status     Status
 }
 
-func (dst *<%= pgtype_array_type %>) Set(src interface{}) error {
+func (dst *BPCharArray) Set(src interface{}) error {
+	// untyped nil and typed nil interfaces are different
+	if src == nil {
+		*dst = BPCharArray{Status: Null}
+		return nil
+	}
+
 	switch value := src.(type) {
-	<% go_array_types.split(",").each do |t| %>
-	case <%= t %>:
+
+	case []string:
 		if value == nil {
-			*dst = <%= pgtype_array_type %>{Status: Null}
+			*dst = BPCharArray{Status: Null}
 		} else if len(value) == 0 {
-			*dst = <%= pgtype_array_type %>{Status: Present}
+			*dst = BPCharArray{Status: Present}
 		} else {
-			elements := make([]<%= pgtype_element_type %>, len(value))
+			elements := make([]BPChar, len(value))
 			for i := range value {
 				if err := elements[i].Set(value[i]); err != nil {
 					return err
 				}
 			}
-			*dst = <%= pgtype_array_type %>{
+			*dst = BPCharArray{
 				Elements:   elements,
 				Dimensions: []ArrayDimension{{Length: int32(len(elements)), LowerBound: 1}},
 				Status:     Present,
 			}
 		}
-	<% end %>
+
 	default:
 		if originalSrc, ok := underlyingSliceType(src); ok {
 			return dst.Set(originalSrc)
 		}
-		return errors.Errorf("cannot convert %v to <%= pgtype_element_type %>", value)
+		return errors.Errorf("cannot convert %v to BPCharArray", value)
 	}
 
 	return nil
 }
 
-func (dst *<%= pgtype_array_type %>) Get() interface{} {
+func (dst *BPCharArray) Get() interface{} {
 	switch dst.Status {
 	case Present:
 		return dst
@@ -57,20 +63,20 @@ func (dst *<%= pgtype_array_type %>) Get() interface{} {
 	}
 }
 
-func (src *<%= pgtype_array_type %>) AssignTo(dst interface{}) error {
+func (src *BPCharArray) AssignTo(dst interface{}) error {
 	switch src.Status {
 	case Present:
 		switch v := dst.(type) {
-		<% go_array_types.split(",").each do |t| %>
-		case *<%= t %>:
-			*v = make(<%= t %>, len(src.Elements))
+
+		case *[]string:
+			*v = make([]string, len(src.Elements))
 			for i := range src.Elements {
 				if err := src.Elements[i].AssignTo(&((*v)[i])); err != nil {
 					return err
 				}
 			}
 			return nil
-		<% end %>
+
 		default:
 			if nextDst, retry := GetAssignToDstType(dst); retry {
 				return src.AssignTo(nextDst)
@@ -83,9 +89,9 @@ func (src *<%= pgtype_array_type %>) AssignTo(dst interface{}) error {
 	return errors.Errorf("cannot decode %v into %T", src, dst)
 }
 
-func (dst *<%= pgtype_array_type %>) DecodeText(ci *ConnInfo, src []byte) error {
+func (dst *BPCharArray) DecodeText(ci *ConnInfo, src []byte) error {
 	if src == nil {
-		*dst = <%= pgtype_array_type %>{Status: Null}
+		*dst = BPCharArray{Status: Null}
 		return nil
 	}
 
@@ -94,13 +100,13 @@ func (dst *<%= pgtype_array_type %>) DecodeText(ci *ConnInfo, src []byte) error 
 		return err
 	}
 
-	var elements []<%= pgtype_element_type %>
+	var elements []BPChar
 
 	if len(uta.Elements) > 0 {
-		elements = make([]<%= pgtype_element_type %>, len(uta.Elements))
+		elements = make([]BPChar, len(uta.Elements))
 
 		for i, s := range uta.Elements {
-			var elem <%= pgtype_element_type %>
+			var elem BPChar
 			var elemSrc []byte
 			if s != "NULL" {
 				elemSrc = []byte(s)
@@ -114,15 +120,14 @@ func (dst *<%= pgtype_array_type %>) DecodeText(ci *ConnInfo, src []byte) error 
 		}
 	}
 
-	*dst = <%= pgtype_array_type %>{Elements: elements, Dimensions: uta.Dimensions, Status: Present}
+	*dst = BPCharArray{Elements: elements, Dimensions: uta.Dimensions, Status: Present}
 
 	return nil
 }
 
-<% if binary_format == "true" %>
-func (dst *<%= pgtype_array_type %>) DecodeBinary(ci *ConnInfo, src []byte) error {
+func (dst *BPCharArray) DecodeBinary(ci *ConnInfo, src []byte) error {
 	if src == nil {
-		*dst = <%= pgtype_array_type %>{Status: Null}
+		*dst = BPCharArray{Status: Null}
 		return nil
 	}
 
@@ -133,7 +138,7 @@ func (dst *<%= pgtype_array_type %>) DecodeBinary(ci *ConnInfo, src []byte) erro
 	}
 
 	if len(arrayHeader.Dimensions) == 0 {
-		*dst = <%= pgtype_array_type %>{Dimensions: arrayHeader.Dimensions, Status: Present}
+		*dst = BPCharArray{Dimensions: arrayHeader.Dimensions, Status: Present}
 		return nil
 	}
 
@@ -142,14 +147,14 @@ func (dst *<%= pgtype_array_type %>) DecodeBinary(ci *ConnInfo, src []byte) erro
 		elementCount *= d.Length
 	}
 
-	elements := make([]<%= pgtype_element_type %>, elementCount)
+	elements := make([]BPChar, elementCount)
 
 	for i := range elements {
 		elemLen := int(int32(binary.BigEndian.Uint32(src[rp:])))
 		rp += 4
 		var elemSrc []byte
 		if elemLen >= 0 {
-			elemSrc = src[rp:rp+elemLen]
+			elemSrc = src[rp : rp+elemLen]
 			rp += elemLen
 		}
 		err = elements[i].DecodeBinary(ci, elemSrc)
@@ -158,12 +163,11 @@ func (dst *<%= pgtype_array_type %>) DecodeBinary(ci *ConnInfo, src []byte) erro
 		}
 	}
 
-	*dst = <%= pgtype_array_type %>{Elements: elements, Dimensions: arrayHeader.Dimensions, Status: Present}
+	*dst = BPCharArray{Elements: elements, Dimensions: arrayHeader.Dimensions, Status: Present}
 	return nil
 }
-<% end %>
 
-func (src *<%= pgtype_array_type %>) EncodeText(ci *ConnInfo, buf []byte) ([]byte, error) {
+func (src *BPCharArray) EncodeText(ci *ConnInfo, buf []byte) ([]byte, error) {
 	switch src.Status {
 	case Null:
 		return nil, nil
@@ -205,7 +209,7 @@ func (src *<%= pgtype_array_type %>) EncodeText(ci *ConnInfo, buf []byte) ([]byt
 			return nil, err
 		}
 		if elemBuf == nil {
-			buf = append(buf, `<%= text_null %>`...)
+			buf = append(buf, `NULL`...)
 		} else {
 			buf = append(buf, QuoteArrayElementIfNeeded(string(elemBuf))...)
 		}
@@ -220,54 +224,52 @@ func (src *<%= pgtype_array_type %>) EncodeText(ci *ConnInfo, buf []byte) ([]byt
 	return buf, nil
 }
 
-<% if binary_format == "true" %>
-	func (src *<%= pgtype_array_type %>) EncodeBinary(ci *ConnInfo, buf []byte) ([]byte, error) {
-		switch src.Status {
-		case Null:
-			return nil, nil
-		case Undefined:
-			return nil, errUndefined
-		}
-
-		arrayHeader := ArrayHeader{
-			Dimensions: src.Dimensions,
-		}
-
-		if dt, ok := ci.DataTypeForName("<%= element_type_name %>"); ok {
-			arrayHeader.ElementOID = int32(dt.OID)
-		} else {
-			return nil, errors.Errorf("unable to find oid for type name %v", "<%= element_type_name %>")
-		}
-
-		for i := range src.Elements {
-			if src.Elements[i].Status == Null {
-				arrayHeader.ContainsNull = true
-				break
-			}
-		}
-
-		buf = arrayHeader.EncodeBinary(ci, buf)
-
-		for i := range src.Elements {
-			sp := len(buf)
-			buf = pgio.AppendInt32(buf, -1)
-
-			elemBuf, err := src.Elements[i].EncodeBinary(ci, buf)
-			if err != nil {
-			  return nil, err
-			}
-			if elemBuf != nil {
-				buf = elemBuf
-				pgio.SetInt32(buf[sp:], int32(len(buf[sp:])-4))
-			}
-		}
-
-		return buf, nil
+func (src *BPCharArray) EncodeBinary(ci *ConnInfo, buf []byte) ([]byte, error) {
+	switch src.Status {
+	case Null:
+		return nil, nil
+	case Undefined:
+		return nil, errUndefined
 	}
-<% end %>
+
+	arrayHeader := ArrayHeader{
+		Dimensions: src.Dimensions,
+	}
+
+	if dt, ok := ci.DataTypeForName("bpchar"); ok {
+		arrayHeader.ElementOID = int32(dt.OID)
+	} else {
+		return nil, errors.Errorf("unable to find oid for type name %v", "bpchar")
+	}
+
+	for i := range src.Elements {
+		if src.Elements[i].Status == Null {
+			arrayHeader.ContainsNull = true
+			break
+		}
+	}
+
+	buf = arrayHeader.EncodeBinary(ci, buf)
+
+	for i := range src.Elements {
+		sp := len(buf)
+		buf = pgio.AppendInt32(buf, -1)
+
+		elemBuf, err := src.Elements[i].EncodeBinary(ci, buf)
+		if err != nil {
+			return nil, err
+		}
+		if elemBuf != nil {
+			buf = elemBuf
+			pgio.SetInt32(buf[sp:], int32(len(buf[sp:])-4))
+		}
+	}
+
+	return buf, nil
+}
 
 // Scan implements the database/sql Scanner interface.
-func (dst *<%= pgtype_array_type %>) Scan(src interface{}) error {
+func (dst *BPCharArray) Scan(src interface{}) error {
 	if src == nil {
 		return dst.DecodeText(nil, nil)
 	}
@@ -285,7 +287,7 @@ func (dst *<%= pgtype_array_type %>) Scan(src interface{}) error {
 }
 
 // Value implements the database/sql/driver Valuer interface.
-func (src *<%= pgtype_array_type %>) Value() (driver.Value, error) {
+func (src *BPCharArray) Value() (driver.Value, error) {
 	buf, err := src.EncodeText(nil, nil)
 	if err != nil {
 		return nil, err
