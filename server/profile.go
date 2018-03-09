@@ -22,7 +22,9 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 
 	s.log("DEBUG: Authorization: %#v", r.Header.Get("Authorization"))
 
-	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, s.keyFunc)
+	var claims jwt.StandardClaims
+
+	token, err := request.ParseFromRequestWithClaims(r, request.AuthorizationHeaderExtractor, &claims, s.keyFunc)
 	if err != nil {
 		writeError(w, r, err, http.StatusUnauthorized, meta)
 		return
@@ -33,16 +35,13 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		writeError(w, r, errInvalidJWTClaims, http.StatusBadRequest, meta)
-		return
-	}
+	profile := hardcodedProfiles[claims.Subject]
 
 	writeJSON(w, Response{
 		Meta: meta,
 		Data: Data{
-			"claims": claims,
+			"claims":  claims,
+			"profile": profile,
 		},
 	})
 }
