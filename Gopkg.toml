@@ -1,5 +1,5 @@
 [metadata.heroku]
   root-package = "github.com/athega/flockflow-server"
-  go-version = "go1.9.2"
+  go-version = "go1.10"
   install = [ "./..." ]
   ensure = "false"
