@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 var (
@@ -47,6 +49,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		s.post(w, r)
 	}
+}
+
+func (s *Server) signedString(sub string) (string, error) {
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
+		Issuer:   "flockflow",
+		IssuedAt: jwt.TimeFunc().Unix(),
+		Subject:  sub,
+	}).SignedString(s.secretKey)
 }
 
 func (s *Server) now() time.Time {

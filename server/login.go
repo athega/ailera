@@ -13,8 +13,11 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: REPLACE WITH JWT
-	token := id
+	token, err := s.signedString(id)
+	if err != nil {
+		writeError(w, r, err, http.StatusInternalServerError, makeMeta(r, s.now()))
+		return
+	}
 
 	http.Redirect(w, r, "flockflow://Login?token="+token, http.StatusPermanentRedirect)
 }
