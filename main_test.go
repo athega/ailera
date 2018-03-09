@@ -4,18 +4,16 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	env "github.com/TV4/env"
 )
 
 func TestSetup(t *testing.T) {
 	logger := log.New(os.Stdout, "", 0)
 
-	addr, s := setup(logger)
+	hs := setup(logger, env.MapClient(env.Map{}))
 
-	if got, want := addr, ":3000"; got != want {
-		t.Fatalf("addr = %q, want %q", got, want)
-	}
-
-	if s == nil {
-		t.Fatal("s is nil")
+	if got, want := hs.Addr, ":3000"; got != want {
+		t.Fatalf("hs.Addr = %q, want %q", got, want)
 	}
 }

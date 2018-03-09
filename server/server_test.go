@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func TestNewServer(t *testing.T) {
-	if got := NewServer(nil, nil); got == nil {
-		t.Fatal("NewServer returned nil")
+func TestNew(t *testing.T) {
+	if got := New(nil, "testsecret"); got == nil {
+		t.Fatal("New returned nil")
 	}
 }
 
@@ -18,7 +18,7 @@ func TestServeHTTP(t *testing.T) {
 
 	logger := log.New(&buf, "", 0)
 
-	s := NewServer(logger, nil)
+	s := New(logger, "testsecret")
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "http://example.org/", nil)

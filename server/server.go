@@ -61,6 +61,8 @@ func (s *Server) get(w http.ResponseWriter, r *http.Request) {
 	meta := makeMeta(r, s.now())
 
 	switch r.URL.Path {
+	case "/":
+		s.index(w, r)
 	case "/login":
 		s.login(w, r)
 	case "/profile":
