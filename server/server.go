@@ -2,26 +2,37 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"time"
-
-	pgx "github.com/jackc/pgx"
 )
 
-func NewServer(logger *log.Logger, pool *pgx.ConnPool) *Server {
+var (
+	errHTTPSRequired   = errors.New("HTTPS required")
+	errUnknownKey      = errors.New("unknown key")
+	errUnknownEndpoint = errors.New("unknown endpoint")
+)
+
+func New(logger *log.Logger, secretKey string) *Server {
 	return &Server{
-		logger: logger,
-		pool:   pool,
+		logger:    logger,
+		secretKey: secretKey,
 	}
 }
 
 type Server struct {
-	logger *log.Logger
-	pool   *pgx.ConnPool
+	logger    *log.Logger
+	secretKey string
+	timeNow   func() time.Time
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("X-Forwarded-Proto") == "http" {
+		writeError(w, r, errHTTPSRequired, http.StatusForbidden, nil)
+		return
+	}
+
 	proto := r.Header.Get("X-Forwarded-Proto")
 
 	if proto == "" {
@@ -33,82 +44,48 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		s.get(w, r)
+	case http.MethodPost:
+		s.post(w, r)
 	}
+}
+
+func (s *Server) now() time.Time {
+	if s.timeNow == nil {
+		s.timeNow = time.Now
+	}
+
+	return s.timeNow()
 }
 
 func (s *Server) get(w http.ResponseWriter, r *http.Request) {
+	meta := makeMeta(r, s.now())
+
 	switch r.URL.Path {
-	case "/api/v1/db":
-		s.db(w, r)
-	case "/api/v1/codes":
-		s.codes(w, r)
+	case "/login":
+		s.login(w, r)
+	case "/profile":
+		s.profile(w, r)
 	default:
-		w.Write([]byte("FlockFlow"))
+		writeError(w, r, errUnknownEndpoint, http.StatusBadRequest, meta)
 	}
 }
 
-func (s *Server) db(w http.ResponseWriter, r *http.Request) {
-	sql := `SELECT firstname, lastname, image, pers_number, email FROM userdata`
-
-	rows, err := s.pool.Query(sql)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	data := []Data{}
-
-	for rows.Next() {
-		if values, err := rows.Values(); err == nil {
-			data = append(data, Data{
-				"firstname":   values[0],
-				"lastname":    values[1],
-				"image":       values[2],
-				"pers_number": values[3],
-				"email":       values[4],
-			})
-		}
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	enc.Encode(ListResponse{
-		Meta: makeMeta(r, time.Now()),
-		Data: data,
-	})
-}
-
-func (s *Server) codes(w http.ResponseWriter, r *http.Request) {
-	sql := `UPDATE code SET used = TRUE WHERE id IN (SELECT id FROM code WHERE used = FALSE LIMIT 1) RETURNING code`
-
-	rows, err := s.pool.Query(sql)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	data := []Data{}
-
-	for rows.Next() {
-		if values, err := rows.Values(); err == nil {
-			data = append(data, Data{
-				"idcode": values[0],
-			})
-		}
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	enc.Encode(ListResponse{Meta: makeMeta(r, time.Now()),
-		Data: data,
-	})
-}
+func (s *Server) post(w http.ResponseWriter, r *http.Request) {}
 
 func (s *Server) log(format string, v ...interface{}) {
 	s.logger.Printf(format+"\n", v...)
+}
+
+func writeJSON(w http.ResponseWriter, v interface{}, statuses ...int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Add("Vary", "Accept-Encoding")
+
+	if len(statuses) > 0 {
+		w.WriteHeader(statuses[0])
+	}
+
+	enc := json.NewEncoder(w)
+
+	enc.SetIndent("", "  ")
+	enc.Encode(v)
 }

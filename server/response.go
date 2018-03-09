@@ -6,13 +6,33 @@ import (
 )
 
 type ListResponse struct {
-	Meta Meta   `json:"meta,omitempty"`
-	Data []Data `json:"data,omitempty"`
+	Meta   Meta    `json:"meta,omitempty"`
+	Data   []Data  `json:"data,omitempty"`
+	Errors []Error `json:"errors,omitempty"`
 }
 
 type Response struct {
-	Meta Meta `json:"meta,omitempty"`
-	Data Data `json:"data,omitempty"`
+	Meta   Meta    `json:"meta,omitempty"`
+	Data   Data    `json:"data,omitempty"`
+	Errors []Error `json:"errors,omitempty"`
+}
+
+func writeError(w http.ResponseWriter, r *http.Request, err error, status int, meta Meta) {
+	writeJSON(w, errorResponse(err, r.Header.Get("X-Request-ID"), status, meta), status)
+}
+
+func errorResponse(err error, id string, status int, meta Meta) Response {
+	return Response{
+		Meta: meta,
+		Errors: []Error{
+			{
+				ID:     id,
+				Status: status,
+				Title:  http.StatusText(status),
+				Detail: err.Error(),
+			},
+		},
+	}
 }
 
 func makeMeta(r *http.Request, now time.Time, options ...func(Meta)) Meta {
@@ -35,3 +55,11 @@ type Meta map[string]interface{}
 
 // Data is the primary data of the Response
 type Data map[string]interface{}
+
+// Error objects provide additional information about problems encountered while performing an operation.
+type Error struct {
+	ID     string `json:"id,omitempty"`
+	Status int    `json:"status"`
+	Title  string `json:"title"`
+	Detail string `json:"detail,omitempty"`
+}

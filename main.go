@@ -4,41 +4,32 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
-	pgx "github.com/jackc/pgx"
+	env "github.com/TV4/env"
+	graceful "github.com/TV4/graceful"
 
 	"github.com/athega/flockflow-server/server"
+)
+
+const (
+	defaultPort              = "3000"
+	defaultSecretKey         = "secret"
+	defaultReadTimeout       = 20 * time.Second
+	defaultReadHeaderTimeout = 10 * time.Second
 )
 
 func main() {
 	logger := log.New(os.Stdout, "", 0)
 
-	addr, s := setup(logger)
-
-	logger.Printf("Listening on http://localhost%s\n", addr)
-
-	http.ListenAndServe(addr, s)
+	graceful.LogListenAndServe(setup(logger, env.DefaultClient), logger)
 }
 
-func setup(logger *log.Logger) (string, *server.Server) {
-	var addr = ":3000"
-
-	if port := os.Getenv("PORT"); port != "" {
-		addr = ":" + port
+func setup(logger *log.Logger, e env.Client) *http.Server {
+	return &http.Server{
+		Addr:              ":" + e.String("PORT", defaultPort),
+		Handler:           server.New(logger, e.String("SECRET_KEY", defaultSecretKey)),
+		ReadTimeout:       e.Duration("READ_TIMEOUT", defaultReadTimeout),
+		ReadHeaderTimeout: e.Duration("READ_HEADER_TIMEOUT", defaultReadHeaderTimeout),
 	}
-
-	connConfig, err := pgx.ParseConnectionString(os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatalf("Unable to create connection config: %v\n", err)
-	}
-
-	pool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-		ConnConfig:     connConfig,
-		MaxConnections: 5,
-	})
-	if err != nil {
-		log.Fatalf("Unable to create connection pool: %v\n", err)
-	}
-
-	return addr, server.NewServer(logger, pool)
 }

@@ -2,27 +2,20 @@
 
 
 [[projects]]
-  name = "github.com/jackc/pgx"
-  packages = [
-    ".",
-    "chunkreader",
-    "internal/sanitize",
-    "pgio",
-    "pgproto3",
-    "pgtype"
-  ]
-  revision = "da3231b0b66e2e74cdb779f1d46c5e958ba8be27"
-  version = "v3.1.0"
+  name = "github.com/TV4/env"
+  packages = ["."]
+  revision = "606d18b28e5bd4e50312a75e1d5045191d88a8e4"
+  version = "v0.1.2"
 
 [[projects]]
-  name = "github.com/pkg/errors"
+  name = "github.com/TV4/graceful"
   packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "38c3c4980bed6ed0aac95529c2cded4986e0e2a8"
+  version = "v0.3.3"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fc81d1db4faa9ce6a72a3ae60a4be03e0390746a1d350b1c005101db210e989f"
+  inputs-digest = "b005d06ed9d37d3f752f944682acb5c744f604fc6264757752a0a2f004cd4611"
   solver-name = "gps-cdcl"
   solver-version = 1
