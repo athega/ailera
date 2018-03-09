@@ -8,11 +8,13 @@ import (
 )
 
 type Profile struct {
+	ID   string
 	Name string
 }
 
 var hardcodedProfiles = map[string]Profile{
 	"5678": Profile{
+		ID:   "5678",
 		Name: "Foo Bar",
 	},
 }
@@ -40,8 +42,8 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, Response{
 		Meta: meta,
 		Data: Data{
-			"claims":  claims,
-			"profile": profile,
+			"id":   profile.ID,
+			"name": profile.Name,
 		},
 	})
 }
