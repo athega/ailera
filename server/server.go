@@ -91,7 +91,6 @@ func (s *Server) claimsFromRequest(r *http.Request) (*jwt.StandardClaims, error)
 	}
 
 	if !token.Valid {
-		panic("foo")
 		return nil, errInvalidJWT
 	}
 
