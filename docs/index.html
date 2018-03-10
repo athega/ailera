@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>FlockFlow</title>
+		<meta name="description" content="Backend for the FlockFlow iOS application">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<style>
+			tt, pre, code { font-family: Consolas, "Liberation Mono", Courier, monospace; background-color: transparent !important; }
+			pre.prettyprint { border: 0px !important; background-color: #fff; margin-bottom: -0.5em; }
+			table { width: 100%; border-collapse: collapse; margin-bottom: 1.3em; }
+			th { background: #f2f2f2; }
+			td, th { padding: 6px 9.5px; border: 1px solid #e4e4e4; text-align: left; }
+			tbody tr:nth-of-type(even){ background:rgba(220,220,220,0.2); }
+			.panel-heading h2 { margin-top: 0.5em; }
+			.bg-default { background-color: #F8F8F8; }
+			.snippet { background: #FFFFFF; list-style: none; display: none; }
+			.snippet-toggle { margin-top: -0.3em; }
+			.parameters { margin-bottom: 0; }
+			.parameters-li { padding: 0; }
+			.parameters td { vertical-align: top; border-color: #eee; border-width: 0 0 1px 0; }
+			.parameters td p { margin-bottom: 0; }
+			.parameters td code { padding: 0; }
+			.parameters thead th { padding: 3px 9px 3px 11px; color: #595959; font-weight: 400; font-size: 0.75em; }
+			.parameters tbody tr:nth-of-type(even){ background: #fff; }
+			.parameters tbody tr:last-child td { border-bottom: 0; }
+			.parameters tbody td:nth-child(1) { width: 10%; min-width: 100px; }
+			.parameters tbody td:nth-child(2) { width: 60%; }
+			.parameter-example { word-break: keep-all; }
+			.parameter-name { text-align: right; }
+			.parameters .label-string { background: #99ac6d; }
+			.parameters .label-boolean { background: #8298bd; }
+			.parameters .label-integer { background: #cd6a50; }
+			.parameters .label-time { background: #f0ad4e; }
+			@media screen and (max-width: 640px) {
+				.parameters {
+					overflow-x: auto;
+					display: block;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="page-header">
+						<h1>FlockFlow</h1>
+						<h2><small><p>Backend for the FlockFlow iOS application</p>
+</small></h2>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="margin-bottom: 2em;">
+				<div class="col-md-12">
+<ul class="nav nav-pills" id="group-tab">
+	
+		<li><a href="#client" data-toggle="tab"><strong>Client</strong></a></li>
+	
+		<li><a href="#info" data-toggle="tab"><strong>Info</strong></a></li>
+	
+</ul>
+</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12">
+					<div class="tab-content">
+
+	<div class="tab-pane" id="client">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 id="client">Client</h2>
+			</div>
+			<div class="panel-body">
+				<div class="lead">
+					<small>
+						<p>Endpoints used by the iOS application</p>
+
+					</small>
+				</div>
+				
+
+	
+	
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<span class="btn btn-primary">GET</span>
+			<code>/login{?key}</code>
+		</div>
+		<div class="panel-body">
+			
+		</div>
+		<ul class="list-group">
+			
+				<li class="list-group-item bg-default"><strong>Parameters</strong></li>
+				<li class="list-group-item parameters-li">
+<table class="parameters">
+	<thead>
+		<tr>
+			<th class="parameter-name">Name</th>
+			<th>Description</th>
+			<th>Required</th>
+			<th>Type</th>
+			<th>Example</th>
+		</tr>
+	</thead>
+	
+		<tr>
+			<td class="parameter-name">
+				<strong>key</strong>
+			</td>
+			<td class="parameter-description"><p>The key used to log in</p>
+</td>
+			<td class="parameter-required">
+				
+					<strong>Required</strong>
+				
+			</td>
+			<td class="parameter-type">
+				<span class="label label-default label-string">string</span>
+			</td>
+			<td class="parameter-example">
+				
+					<code>1234</code>
+				
+			</td>
+		</tr>
+	
+</table>
+</li>
+			
+			
+	
+		
+	
+
+		
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>302</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+				<code>&lt; Content-Type: application/json; charset=utf-8</code><br>
+			
+			
+				<pre class="prettyprint">Redirected to the application with a JWT
+
+</pre>
+			
+		</li>
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>401</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+			
+		</li>
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>500</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+			
+		</li>
+	
+
+	
+
+		</ul>
+	</div>
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<span class="btn btn-success">POST</span>
+			<code>/login{?key}</code>
+		</div>
+		<div class="panel-body">
+			
+		</div>
+		<ul class="list-group">
+			
+				<li class="list-group-item bg-default"><strong>Parameters</strong></li>
+				<li class="list-group-item parameters-li">
+<table class="parameters">
+	<thead>
+		<tr>
+			<th class="parameter-name">Name</th>
+			<th>Description</th>
+			<th>Required</th>
+			<th>Type</th>
+			<th>Example</th>
+		</tr>
+	</thead>
+	
+		<tr>
+			<td class="parameter-name">
+				<strong>key</strong>
+			</td>
+			<td class="parameter-description"><p>The key used to log in</p>
+</td>
+			<td class="parameter-required">
+				
+					<strong>Required</strong>
+				
+			</td>
+			<td class="parameter-type">
+				<span class="label label-default label-string">string</span>
+			</td>
+			<td class="parameter-example">
+				
+					<code>1234</code>
+				
+			</td>
+		</tr>
+	
+</table>
+</li>
+			
+			
+		</ul>
+	</div>
+	
+
+	
+	
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<span class="btn btn-primary">GET</span>
+			<code>/profile</code>
+		</div>
+		<div class="panel-body">
+			<blockquote>
+<p>Requires a valid token provided in the <code>Authorization</code> header or <code>access_token</code> query string parameter.</p>
+</blockquote>
+
+		</div>
+		<ul class="list-group">
+			
+			
+	
+		
+	
+
+		
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>200</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+				<code>&lt; Content-Type: application/json; charset=utf-8</code><br>
+			
+			
+		</li>
+	
+
+	
+
+		</ul>
+	</div>
+	
+
+
+			</div>
+		</div>
+	</div>
+
+	<div class="tab-pane" id="info">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 id="info">Info</h2>
+			</div>
+			<div class="panel-body">
+				<div class="lead">
+					<small>
+						<p>Endpoints containing information about the FlockFlow backend</p>
+
+					</small>
+				</div>
+				
+
+	
+	
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<span class="btn btn-primary">GET</span>
+			<code>/__status</code>
+		</div>
+		<div class="panel-body">
+			
+		</div>
+		<ul class="list-group">
+			
+			
+	
+		
+	
+
+		
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>200</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+				<code>&lt; Content-Type: application/json; charset=utf-8</code><br>
+			
+			
+		</li>
+	
+
+	
+
+		</ul>
+	</div>
+	
+
+
+			</div>
+		</div>
+	</div>
+
+</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<script>
+			jQuery(function($) {
+ 				$('#group-tab a[data-toggle="tab"]').on("click", function(e) {
+ 					window.location.hash = $(this).attr("href");
+ 				});
+
+ 				if(window.location.hash){
+ 					$('#group-tab a:first').tab('show');
+ 					$('#group-tab a[href$="'+ window.location.hash +'"]').tab("show");
+ 				} else {
+ 					$('#group-tab a:first').tab('show');
+ 				}
+
+				$('.snippet-toggle').on("click", function(e) {
+					e.preventDefault();
+					var target = $(this).data('target');
+					$(this).parent().next().toggle();
+					if ($(this).text() == "SHOW") {
+						$(this).text("HIDE");
+					} else {
+						$(this).text("SHOW");
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
+
+
+
+
+
+
