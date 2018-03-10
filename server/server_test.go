@@ -5,12 +5,13 @@ import (
 	"log"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/athega/flockflow-server/mock"
 )
 
-var testSecretKey = []byte("testsecret")
-
 func TestNew(t *testing.T) {
-	if got := New(nil, testSecretKey); got == nil {
+	if got := New(nil, mock.NewService(nil), testSecretKey); got == nil {
 		t.Fatal("New returned nil")
 	}
 }
@@ -20,10 +21,9 @@ func TestServeHTTP(t *testing.T) {
 
 	logger := log.New(&buf, "", 0)
 
-	s := New(logger, testSecretKey)
-
+	s := testServer(logger)
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "http://example.org/", nil)
+	r := httptest.NewRequest("GET", "http://example.org/__status", nil)
 
 	s.ServeHTTP(w, r)
 
@@ -31,7 +31,23 @@ func TestServeHTTP(t *testing.T) {
 		t.Fatalf("w.Code = %d, want %d", got, want)
 	}
 
-	if got, want := buf.String(), "GET http://example.org/\n"; got != want {
+	if got, want := buf.String(), "GET http://example.org/__status\n"; got != want {
 		t.Fatalf("buf.String() = %q, want %q", got, want)
 	}
+}
+
+var testSecretKey = []byte("testsecret")
+
+func testServer(logger *log.Logger, options ...func(*Server)) *Server {
+	s := New(logger, mock.NewService(logger), testSecretKey)
+
+	s.timeNow = func() time.Time {
+		return time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	for _, f := range options {
+		f(s)
+	}
+
+	return s
 }

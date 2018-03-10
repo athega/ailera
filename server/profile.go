@@ -1,62 +1,32 @@
 package server
 
-import (
-	"net/http"
-
-	jwt "github.com/dgrijalva/jwt-go"
-	request "github.com/dgrijalva/jwt-go/request"
-)
-
-var hardcodedProfiles = map[string]Profile{
-	"5678": Profile{
-		ID:    "5678",
-		Name:  "Foo Bar",
-		Email: "foo.bar@example.com",
-		Link:  "http://example.com/",
-		Phone: "012345678",
-	},
-}
+import "net/http"
 
 func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 	meta := makeMeta(r, s.now())
 
-	s.log("DEBUG: Authorization: %#v", r.Header.Get("Authorization"))
-
-	var claims jwt.StandardClaims
-
-	token, err := request.ParseFromRequestWithClaims(r, request.AuthorizationHeaderExtractor, &claims, s.keyFunc)
+	claims, err := s.claimsFromRequest(r)
 	if err != nil {
 		writeError(w, r, err, http.StatusUnauthorized, meta)
 		return
 	}
 
-	if !token.Valid || token.Method != jwt.SigningMethodHS256 {
-		writeError(w, r, errInvalidJWT, http.StatusUnauthorized, meta)
+	meta["claims"] = claims
+
+	profile, err := s.service.Profile(r.Context(), claims.Subject)
+	if err != nil {
+		writeError(w, r, err, http.StatusInternalServerError, meta)
 		return
 	}
 
-	profile := hardcodedProfiles[claims.Subject]
-
 	writeJSON(w, Response{
 		Meta: meta,
-		Data: profile.Data(),
+		Data: Data{
+			"id":    profile.ID,
+			"name":  profile.Name,
+			"email": profile.Email,
+			"link":  profile.Link,
+			"phone": profile.Phone,
+		},
 	})
-}
-
-type Profile struct {
-	ID    string
-	Name  string
-	Email string
-	Link  string
-	Phone string
-}
-
-func (p Profile) Data() Data {
-	return Data{
-		"id":    p.ID,
-		"name":  p.Name,
-		"email": p.Email,
-		"link":  p.Link,
-		"phone": p.Phone,
-	}
 }

@@ -3,11 +3,16 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	request "github.com/dgrijalva/jwt-go/request"
+	sendgrid "github.com/sendgrid/sendgrid-go"
+
+	"github.com/athega/flockflow-server/flockflow"
 )
 
 var (
@@ -18,17 +23,29 @@ var (
 	errInvalidJWTClaims = errors.New("invalid JWT claims")
 )
 
-func New(logger *log.Logger, secretKey []byte) *Server {
-	return &Server{
+func New(logger flockflow.Logger, service flockflow.Service, secretKey []byte) *Server {
+	if logger == nil {
+		logger = log.New(ioutil.Discard, "", 0)
+	}
+
+	s := &Server{
 		logger:    logger,
 		secretKey: secretKey,
+		service:   service,
 	}
+
+	s.registerHandlers()
+
+	return s
 }
 
 type Server struct {
-	logger    *log.Logger
+	logger    flockflow.Logger
+	service   flockflow.Service
 	secretKey []byte
+	sendgrid  *sendgrid.Client
 	timeNow   func() time.Time
+	mux       *http.ServeMux
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -45,12 +62,40 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	s.log("%s %s://%s%s", r.Method, proto, r.Host, r.URL.Path)
 
-	switch r.Method {
-	case http.MethodGet:
-		s.get(w, r)
-	case http.MethodPost:
-		s.post(w, r)
+	s.mux.ServeHTTP(w, r)
+}
+
+func (s *Server) registerHandlers() {
+	if s.mux == nil {
+		s.mux = http.NewServeMux()
 	}
+
+	s.mux.Handle("/", http.FileServer(http.Dir("docs")))
+	s.mux.Handle("/login", http.HandlerFunc(s.login))
+	s.mux.Handle("/profile", http.HandlerFunc(s.profile))
+	s.mux.Handle("/__status", http.HandlerFunc(s.status))
+}
+
+func (s *Server) claimsFromRequest(r *http.Request) (*jwt.StandardClaims, error) {
+	var claims jwt.StandardClaims
+
+	token, err := request.ParseFromRequest(r,
+		request.OAuth2Extractor, s.keyFunc,
+		request.WithClaims(&claims),
+		request.WithParser(&jwt.Parser{
+			ValidMethods: []string{jwt.SigningMethodHS256.Name},
+		}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		panic("foo")
+		return nil, errInvalidJWT
+	}
+
+	return &claims, nil
 }
 
 func (s *Server) keyFunc(token *jwt.Token) (interface{}, error) {
@@ -73,28 +118,12 @@ func (s *Server) now() time.Time {
 	return s.timeNow()
 }
 
-func (s *Server) get(w http.ResponseWriter, r *http.Request) {
-	meta := makeMeta(r, s.now())
-
-	switch r.URL.Path {
-	case "/":
-		s.index(w, r)
-	case "/login":
-		s.login(w, r)
-	case "/profile":
-		s.profile(w, r)
-	default:
-		writeError(w, r, errUnknownEndpoint, http.StatusBadRequest, meta)
-	}
-}
-
-func (s *Server) post(w http.ResponseWriter, r *http.Request) {}
-
 func (s *Server) log(format string, v ...interface{}) {
 	s.logger.Printf(format+"\n", v...)
 }
 
 func writeJSON(w http.ResponseWriter, v interface{}, statuses ...int) {
+	w.Header().Set("Server", "flockflow")
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Add("Vary", "Accept-Encoding")
 
