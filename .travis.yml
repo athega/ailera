@@ -4,6 +4,9 @@ go: "1.10"
 
 sudo: false
 
+install:
+  - echo "nothing to install"
+
 script:
   - go vet ./...
   - go test ./...
