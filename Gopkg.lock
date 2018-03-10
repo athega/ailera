@@ -22,9 +22,24 @@
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
   version = "v3.2.0"
 
+[[projects]]
+  name = "github.com/sendgrid/rest"
+  packages = ["."]
+  revision = "80b39aaf5a30edab5bf2f99d56052abe01a0d41d"
+  version = "v2.4.0"
+
+[[projects]]
+  name = "github.com/sendgrid/sendgrid-go"
+  packages = [
+    ".",
+    "helpers/mail"
+  ]
+  revision = "8caf17aa96b4a98bae8bd216878dd50ff12897b5"
+  version = "v3.4.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2c7051151a6782747f1604413840e2b7dea92f096437e04acf574354028ecc0c"
+  inputs-digest = "cd500fe11354384f5eca408a35491313e7d40c684478d591efe570ad4c357e17"
   solver-name = "gps-cdcl"
   solver-version = 1
