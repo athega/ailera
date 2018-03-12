@@ -13,7 +13,7 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 
 	meta["claims"] = claims
 
-	profile, err := s.service.Profile(r.Context(), claims.Subject)
+	profile, err := s.storage.Profile(r.Context(), claims.Subject)
 	if err != nil {
 		writeError(w, r, err, http.StatusInternalServerError, meta)
 		return

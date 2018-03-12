@@ -4,7 +4,7 @@ import "net/http"
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		//s.sendLoginEmail(w, r)
+		s.sendLoginEmail(w, r)
 		return
 	}
 
@@ -12,7 +12,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 
 	key := r.URL.Query().Get("key")
 
-	id, err := s.service.UserID(r.Context(), key)
+	id, err := s.storage.UserID(r.Context(), key)
 	if err != nil {
 		writeError(w, r, err, http.StatusUnauthorized, meta)
 		return
@@ -30,7 +30,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
 	meta := makeMeta(r, s.now())
 
-	if err := s.service.SendEmail(
+	if err := s.mailer.Send(
 		"peter.hellberg@athega.se",
 		"login@flockflow.herokuapp.com",
 		"Login to FlockFlow",

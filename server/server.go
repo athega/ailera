@@ -10,28 +10,25 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
-	sendgrid "github.com/sendgrid/sendgrid-go"
 
 	"github.com/athega/flockflow-server/flockflow"
 )
 
 var (
-	errHTTPSRequired    = errors.New("HTTPS required")
-	errUnknownKey       = errors.New("unknown key")
-	errUnknownEndpoint  = errors.New("unknown endpoint")
-	errInvalidJWT       = errors.New("invalid JWT")
-	errInvalidJWTClaims = errors.New("invalid JWT claims")
+	errHTTPSRequired = errors.New("HTTPS required")
+	errInvalidJWT    = errors.New("invalid JWT")
 )
 
-func New(logger flockflow.Logger, service flockflow.Service, secretKey []byte) *Server {
+func New(logger flockflow.Logger, storage flockflow.Storage, mailer flockflow.Mailer, secretKey []byte) *Server {
 	if logger == nil {
 		logger = log.New(ioutil.Discard, "", 0)
 	}
 
 	s := &Server{
 		logger:    logger,
+		storage:   storage,
+		mailer:    mailer,
 		secretKey: secretKey,
-		service:   service,
 	}
 
 	s.registerHandlers()
@@ -41,9 +38,9 @@ func New(logger flockflow.Logger, service flockflow.Service, secretKey []byte) *
 
 type Server struct {
 	logger    flockflow.Logger
-	service   flockflow.Service
+	storage   flockflow.Storage
+	mailer    flockflow.Mailer
 	secretKey []byte
-	sendgrid  *sendgrid.Client
 	timeNow   func() time.Time
 	mux       *http.ServeMux
 }

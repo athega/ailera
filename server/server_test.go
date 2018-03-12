@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/athega/flockflow-server/flockflow"
 	"github.com/athega/flockflow-server/mock"
 )
 
 func TestNew(t *testing.T) {
-	if got := New(nil, mock.NewService(nil), testSecretKey); got == nil {
+	if got := New(nil, mock.NewStorage(nil), mock.NewMailer(nil), testSecretKey); got == nil {
 		t.Fatal("New returned nil")
 	}
 }
@@ -38,8 +39,8 @@ func TestServeHTTP(t *testing.T) {
 
 var testSecretKey = []byte("testsecret")
 
-func testServer(logger *log.Logger, options ...func(*Server)) *Server {
-	s := New(logger, mock.NewService(logger), testSecretKey)
+func testServer(logger flockflow.Logger, options ...func(*Server)) *Server {
+	s := New(logger, mock.NewStorage(logger), mock.NewMailer(logger), testSecretKey)
 
 	s.timeNow = func() time.Time {
 		return time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)
