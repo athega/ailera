@@ -21,7 +21,7 @@ Redirects to the FlockFlow application
 + Response 401
 + Response 500
 
-## Profile [/profile]
+## Profile [/profile{?access_token}]
 
 ### GET
 
