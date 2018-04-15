@@ -15,7 +15,7 @@ const schema = `
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS logins (
-	key UUID NOT NULL DEFAULT uuid_generate_v4(),
+	key UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v4(),
 	email text UNIQUE NOT NULL,
 	timestamp timestamp NOT NULL DEFAULT NOW()
 );
