@@ -4,6 +4,12 @@ go: "1.10"
 
 sudo: false
 
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database flockflow_test;' -U postgres
+
 install:
   - echo "nothing to install"
 
