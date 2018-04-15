@@ -8,10 +8,7 @@ services:
   - postgresql
 
 before_script:
-  - psql -c 'create database flockflow_test;' -U postgres
-
-env:
-  - DATABASE_URL="postgres://localhost/flockflow_test?sslmode=disable"
+  - psql -c 'create database flockflow_dev;' -U postgres
 
 install:
   - echo "nothing to install"
