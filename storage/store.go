@@ -80,7 +80,7 @@ func (s *Store) LoginKey(ctx context.Context, email string) (string, error) {
 func (s *Store) ProfileID(ctx context.Context, key string) (string, error) {
 	var l flockflow.Login
 
-	if err := s.db.GetContext(ctx, &l, `SELECT * FROM logins WHERE key=$1`, key); err != nil {
+	if err := s.db.GetContext(ctx, &l, `DELETE FROM logins WHERE key=$1 RETURNING *`, key); err != nil {
 		return "", flockflow.ErrInvalidLoginKey
 	}
 
@@ -93,10 +93,7 @@ func (s *Store) ProfileID(ctx context.Context, key string) (string, error) {
 
 	var id string
 
-	if err := s.db.GetContext(ctx, &id,
-		`SELECT id FROM profiles WHERE email=$1`,
-		l.Email,
-	); err != nil {
+	if err := s.db.GetContext(ctx, &id, `SELECT id FROM profiles WHERE email=$1`, l.Email); err != nil {
 		return "", flockflow.ErrProfileNotFound
 	}
 
@@ -106,23 +103,25 @@ func (s *Store) ProfileID(ctx context.Context, key string) (string, error) {
 func (s *Store) Profile(ctx context.Context, subject string) (*flockflow.Profile, error) {
 	var p flockflow.Profile
 
-	if err := s.db.GetContext(ctx, &p, "SELECT * FROM profiles WHERE id=1"); err != nil {
+	if err := s.db.GetContext(ctx, &p, `SELECT * FROM profiles WHERE id=$1`, subject); err != nil {
 		return nil, err
 	}
 
 	return &p, nil
 }
 
-func (s *Store) UpdateProfile(ctx context.Context, subject string, v url.Values) error {
-	_, err := s.db.NamedExecContext(ctx,
-		`UPDATE profiles SET name=:name, link=:link, phone=:phone WHERE id=:id RETURNING *`,
-		&flockflow.Profile{
-			ID:    subject,
-			Name:  v.Get("name"),
-			Link:  v.Get("link"),
-			Phone: v.Get("phone"),
-		},
-	)
+func (s *Store) UpdateProfile(ctx context.Context, subject string, v url.Values) (*flockflow.Profile, error) {
+	var p flockflow.Profile
 
-	return err
+	if err := s.db.GetContext(ctx, &p,
+		`UPDATE profiles SET name=$1, link=$2, phone=$3 WHERE id=$4 RETURNING *`,
+		v.Get("name"),
+		v.Get("link"),
+		v.Get("phone"),
+		subject,
+	); err != nil {
+		return nil, err
+	}
+
+	return &p, nil
 }
