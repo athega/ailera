@@ -25,7 +25,7 @@ type Store interface {
 	LoginKey(ctx context.Context, email string) (string, error)
 	ProfileID(ctx context.Context, key string) (string, error)
 	Profile(ctx context.Context, subject string) (*Profile, error)
-	UpdateProfile(ctx context.Context, subject string, v url.Values) error
+	UpdateProfile(ctx context.Context, subject string, v url.Values) (*Profile, error)
 }
 
 type Profile struct {

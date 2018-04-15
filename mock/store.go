@@ -50,5 +50,5 @@ func (s *Store) Profile(ctx context.Context, subject string) (*flockflow.Profile
 }
 
 func (s *Store) UpdateProfile(ctx context.Context, subject string, v url.Values) error {
-	return nil
+	return &flockflow.Profile{}, nil
 }

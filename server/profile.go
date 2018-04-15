@@ -52,10 +52,20 @@ func (s *Server) updateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.storage.UpdateProfile(r.Context(), claims.Subject, r.Form); err != nil {
+	profile, err := s.storage.UpdateProfile(r.Context(), claims.Subject, r.Form)
+	if err != nil {
 		writeError(w, r, err, http.StatusInternalServerError, meta)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	writeJSON(w, Response{
+		Meta: meta,
+		Data: Data{
+			"id":    profile.ID,
+			"name":  profile.Name,
+			"email": profile.Email,
+			"link":  profile.Link,
+			"phone": profile.Phone,
+		},
+	})
 }
