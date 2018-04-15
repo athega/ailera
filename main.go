@@ -40,9 +40,17 @@ func setup(logger flockflow.Logger, e env.Client) *http.Server {
 		}
 	}
 
+	store, err := storage.ConnectAndSetupSchema(e.String("DATABASE_URL",
+		"postgres://localhost/flockflow_dev?sslmode=disable",
+	))
+	if err != nil {
+		logger.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	return &http.Server{
 		Addr:              ":" + port,
-		Handler:           server.New(logger, storage.New(), mailer, secretKey),
+		Handler:           server.New(logger, store, mailer, secretKey),
 		ReadTimeout:       e.Duration("READ_TIMEOUT", defaultReadTimeout),
 		ReadHeaderTimeout: e.Duration("READ_HEADER_TIMEOUT", defaultReadHeaderTimeout),
 	}

@@ -3,6 +3,11 @@ package server
 import "net/http"
 
 func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		s.updateProfile(w, r)
+		return
+	}
+
 	meta := makeMeta(r, s.now())
 
 	claims, err := s.claimsFromRequest(r)
@@ -29,4 +34,28 @@ func (s *Server) profile(w http.ResponseWriter, r *http.Request) {
 			"phone": profile.Phone,
 		},
 	})
+}
+
+func (s *Server) updateProfile(w http.ResponseWriter, r *http.Request) {
+	meta := makeMeta(r, s.now())
+
+	claims, err := s.claimsFromRequest(r)
+	if err != nil {
+		writeError(w, r, err, http.StatusUnauthorized, meta)
+		return
+	}
+
+	meta["claims"] = claims
+
+	if err := r.ParseForm(); err != nil {
+		writeError(w, r, err, http.StatusBadRequest, meta)
+		return
+	}
+
+	if err := s.storage.UpdateProfile(r.Context(), claims.Subject, r.Form); err != nil {
+		writeError(w, r, err, http.StatusInternalServerError, meta)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

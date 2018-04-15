@@ -23,10 +23,28 @@
   version = "v3.2.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
+  packages = [
+    ".",
+    "reflectx"
+  ]
+  revision = "2aeb6a910c2b94f2d5eb53d9895d80e27264ec41"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
+
+[[projects]]
   name = "github.com/sendgrid/rest"
   packages = ["."]
-  revision = "80b39aaf5a30edab5bf2f99d56052abe01a0d41d"
-  version = "v2.4.0"
+  revision = "306b9bef57dc36f3435ccfcc08fe6ae2c6920344"
+  version = "v2.4.1"
 
 [[projects]]
   name = "github.com/sendgrid/sendgrid-go"
@@ -40,6 +58,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cd500fe11354384f5eca408a35491313e7d40c684478d591efe570ad4c357e17"
+  inputs-digest = "e2dda57b9f97d151733504c136c5887f2aac7733c417e65822924641f2f65add"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,6 +1,9 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -10,9 +13,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 
 	meta := makeMeta(r, s.now())
 
-	key := r.URL.Query().Get("key")
-
-	id, err := s.storage.UserID(r.Context(), key)
+	id, err := s.storage.ProfileID(r.Context(), r.URL.Query().Get("key"))
 	if err != nil {
 		writeError(w, r, err, http.StatusUnauthorized, meta)
 		return
@@ -30,14 +31,27 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
 	meta := makeMeta(r, s.now())
 
-	if err := s.mailer.Send(
-		"peter.hellberg@athega.se",
+	to := r.FormValue("to")
+
+	if !strings.Contains(to, "@") {
+		writeError(w, r, errInvalidEmail, http.StatusBadRequest, meta)
+		return
+	}
+
+	key, err := s.storage.LoginKey(r.Context(), to)
+	if err != nil {
+		writeError(w, r, err, http.StatusInternalServerError, meta)
+		return
+	}
+
+	if err := s.mailer.Send(to,
 		"login@flockflow.herokuapp.com",
 		"Login to FlockFlow",
-		`https://flockflow.herokuapp.com/login?key=1234`,
-		`<a href="https://flockflow.herokuapp.com/login?key=1234">Login to FlockFlow</a>`,
+		`https://flockflow.herokuapp.com/login?key=`+key,
+		`<a href="https://flockflow.herokuapp.com/login?key=`+key+`">Login to FlockFlow</a>`,
 	); err != nil {
 		writeError(w, r, err, http.StatusInternalServerError, meta)
+		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)

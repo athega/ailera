@@ -17,9 +17,10 @@ import (
 var (
 	errHTTPSRequired = errors.New("HTTPS required")
 	errInvalidJWT    = errors.New("invalid JWT")
+	errInvalidEmail  = errors.New("invalid email")
 )
 
-func New(logger flockflow.Logger, storage flockflow.Storage, mailer flockflow.Mailer, secretKey []byte) *Server {
+func New(logger flockflow.Logger, storage flockflow.Store, mailer flockflow.Mailer, secretKey []byte) *Server {
 	if logger == nil {
 		logger = log.New(ioutil.Discard, "", 0)
 	}
@@ -38,7 +39,7 @@ func New(logger flockflow.Logger, storage flockflow.Storage, mailer flockflow.Ma
 
 type Server struct {
 	logger    flockflow.Logger
-	storage   flockflow.Storage
+	storage   flockflow.Store
 	mailer    flockflow.Mailer
 	secretKey []byte
 	timeNow   func() time.Time
