@@ -45,13 +45,7 @@ func ConnectAndSetupSchema(dataSourceName string) (*Store, error) {
 		return nil, err
 	}
 
-	s := &Store{db}
-
-	if _, err := s.LoginKey(context.Background(), "peter.hellberg@athega.se"); err != nil {
-		return nil, err
-	}
-
-	return s, nil
+	return &Store{db}, nil
 }
 
 func New(db *sqlx.DB) *Store {
