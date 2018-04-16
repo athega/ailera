@@ -6,9 +6,23 @@ Backend for the FlockFlow iOS application
 
 Endpoints used by the iOS application
 
-## Login [/login{?key}]
+## Login [/login]
 
-Redirects to the FlockFlow application
++ Parameters
+  + to (required, string, `test@example.com`)
+  The email address to send the login link to
+
+### POST
+
+Login to FlockFlow via link in email
+
+```
+curl -X POST -d 'to=test@example.com' https://flockflow.herokuapp.com/login
+```
+
++ Response 202
+
+## Login [/login{?key}]
 
 + Parameters
   + key (required, string, `1234`)
@@ -16,8 +30,30 @@ Redirects to the FlockFlow application
 
 ### GET
 
+Redirects to the FlockFlow application
+
+The link is formatted like this:
+```
+flockflow://Login?token=<JWT>
+```
+
 + Response 302 (application/json; charset=utf-8)
   Redirected to the application with a JWT
++ Response 401
++ Response 500
+
+## Profile [/profile]
+
+### POST
+
+Update profile
+
+```
+curl -H 'Authorization: Bearer <JWT>' -X POST -d 'link=http://example.com&name=XYZ&phone=123' https://flockflow.herokuapp.com/profile
+```
+
++ Response 200 (application/json; charset=utf-8)
++ Response 400
 + Response 401
 + Response 500
 

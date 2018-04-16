@@ -86,11 +86,94 @@
 	
 	<div class="panel panel-info">
 		<div class="panel-heading">
+			<span class="btn btn-success">POST</span>
+			<code>/login</code>
+		</div>
+		<div class="panel-body">
+			<p>Login to FlockFlow via link in email</p>
+
+<pre><code>curl -X POST -d 'to=test@example.com' https://flockflow.herokuapp.com/login
+</code></pre>
+
+		</div>
+		<ul class="list-group">
+			
+				<li class="list-group-item bg-default"><strong>Parameters</strong></li>
+				<li class="list-group-item parameters-li">
+<table class="parameters">
+	<thead>
+		<tr>
+			<th class="parameter-name">Name</th>
+			<th>Description</th>
+			<th>Required</th>
+			<th>Type</th>
+			<th>Example</th>
+		</tr>
+	</thead>
+	
+		<tr>
+			<td class="parameter-name">
+				<strong>to</strong>
+			</td>
+			<td class="parameter-description"><p>The email address to send the login link to</p>
+</td>
+			<td class="parameter-required">
+				
+					<strong>Required</strong>
+				
+			</td>
+			<td class="parameter-type">
+				<span class="label label-default label-string">string</span>
+			</td>
+			<td class="parameter-example">
+				
+					<code>test@example.com</code>
+				
+			</td>
+		</tr>
+	
+</table>
+</li>
+			
+			
+	
+		
+	
+
+		
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>202</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+			
+		</li>
+	
+
+	
+
+		</ul>
+	</div>
+	
+
+	
+	
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
 			<span class="btn btn-primary">GET</span>
 			<code>/login{?key}</code>
 		</div>
 		<div class="panel-body">
-			
+			<p>Redirects to the FlockFlow application</p>
+
+<p>The link is formatted like this:</p>
+
+<pre><code>flockflow://Login?token=&lt;JWT&gt;
+</code></pre>
+
 		</div>
 		<ul class="list-group">
 			
@@ -150,6 +233,75 @@
 				<pre class="prettyprint">Redirected to the application with a JWT
 
 </pre>
+			
+		</li>
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>401</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+			
+		</li>
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>500</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+			
+		</li>
+	
+
+	
+
+		</ul>
+	</div>
+	
+
+	
+	
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<span class="btn btn-success">POST</span>
+			<code>/profile</code>
+		</div>
+		<div class="panel-body">
+			<p>Update profile</p>
+
+<pre><code>curl -H 'Authorization: Bearer &lt;JWT&gt;' -X POST -d 'link=http://example.com&amp;name=XYZ&amp;phone=123' https://flockflow.herokuapp.com/profile
+</code></pre>
+
+		</div>
+		<ul class="list-group">
+			
+			
+	
+		
+	
+
+		
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>200</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
+				<code>&lt; Content-Type: application/json; charset=utf-8</code><br>
+			
+			
+		</li>
+	
+		<li class="list-group-item bg-default response">
+			<strong>Response <code>400</code></strong>
+			<a href="javascript:;" class="pull-right btn btn-link btn-sm snippet-toggle">SHOW</a>
+		</li>
+		<li class="list-group-item snippet">
+			
 			
 		</li>
 	
