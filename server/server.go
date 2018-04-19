@@ -11,7 +11,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
 
-	"github.com/athega/flockflow-server/flockflow"
+	"github.com/athega/ailera/ailera"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 	errInvalidEmail  = errors.New("invalid email")
 )
 
-func New(logger flockflow.Logger, storage flockflow.Store, mailer flockflow.Mailer, secretKey []byte) *Server {
+func New(logger ailera.Logger, storage ailera.Store, mailer ailera.Mailer, secretKey []byte) *Server {
 	if logger == nil {
 		logger = log.New(ioutil.Discard, "", 0)
 	}
@@ -38,9 +38,9 @@ func New(logger flockflow.Logger, storage flockflow.Store, mailer flockflow.Mail
 }
 
 type Server struct {
-	logger    flockflow.Logger
-	storage   flockflow.Store
-	mailer    flockflow.Mailer
+	logger    ailera.Logger
+	storage   ailera.Store
+	mailer    ailera.Mailer
 	secretKey []byte
 	timeNow   func() time.Time
 	mux       *http.ServeMux
@@ -101,7 +101,7 @@ func (s *Server) keyFunc(token *jwt.Token) (interface{}, error) {
 
 func (s *Server) signedString(sub string) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		Issuer:   "flockflow",
+		Issuer:   "ailera",
 		IssuedAt: jwt.TimeFunc().Unix(),
 		Subject:  sub,
 	}).SignedString([]byte(s.secretKey))
@@ -120,7 +120,7 @@ func (s *Server) log(format string, v ...interface{}) {
 }
 
 func writeJSON(w http.ResponseWriter, v interface{}, statuses ...int) {
-	w.Header().Set("Server", "flockflow")
+	w.Header().Set("Server", "ailera")
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Add("Vary", "Accept-Encoding")
 

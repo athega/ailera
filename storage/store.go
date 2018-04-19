@@ -8,7 +8,7 @@ import (
 
 	sqlx "github.com/jmoiron/sqlx"
 
-	"github.com/athega/flockflow-server/flockflow"
+	"github.com/athega/ailera/ailera"
 )
 
 const schema = `
@@ -61,7 +61,7 @@ func (s *Store) LoginKey(ctx context.Context, email string) (string, error) {
 		VALUES (:email) 
 		ON CONFLICT (email) DO UPDATE
 		SET key = uuid_generate_v4()`,
-		&flockflow.Login{
+		&ailera.Login{
 			Email: email,
 		},
 	); err != nil {
@@ -78,15 +78,15 @@ func (s *Store) LoginKey(ctx context.Context, email string) (string, error) {
 }
 
 func (s *Store) ProfileID(ctx context.Context, key string) (string, error) {
-	var l flockflow.Login
+	var l ailera.Login
 
 	if err := s.db.GetContext(ctx, &l, `DELETE FROM logins WHERE key=$1 RETURNING *`, key); err != nil {
-		return "", flockflow.ErrInvalidLoginKey
+		return "", ailera.ErrInvalidLoginKey
 	}
 
 	if _, err := s.db.NamedExecContext(ctx,
 		`INSERT INTO profiles (email) VALUES (:email) ON CONFLICT DO NOTHING`,
-		&flockflow.Profile{Email: l.Email},
+		&ailera.Profile{Email: l.Email},
 	); err != nil {
 		return "", err
 	}
@@ -94,14 +94,14 @@ func (s *Store) ProfileID(ctx context.Context, key string) (string, error) {
 	var id string
 
 	if err := s.db.GetContext(ctx, &id, `SELECT id FROM profiles WHERE email=$1`, l.Email); err != nil {
-		return "", flockflow.ErrProfileNotFound
+		return "", ailera.ErrProfileNotFound
 	}
 
 	return id, nil
 }
 
-func (s *Store) Profile(ctx context.Context, subject string) (*flockflow.Profile, error) {
-	var p flockflow.Profile
+func (s *Store) Profile(ctx context.Context, subject string) (*ailera.Profile, error) {
+	var p ailera.Profile
 
 	if err := s.db.GetContext(ctx, &p, `SELECT * FROM profiles WHERE id=$1`, subject); err != nil {
 		return nil, err
@@ -110,8 +110,8 @@ func (s *Store) Profile(ctx context.Context, subject string) (*flockflow.Profile
 	return &p, nil
 }
 
-func (s *Store) UpdateProfile(ctx context.Context, subject string, v url.Values) (*flockflow.Profile, error) {
-	var p flockflow.Profile
+func (s *Store) UpdateProfile(ctx context.Context, subject string, v url.Values) (*ailera.Profile, error) {
+	var p ailera.Profile
 
 	if err := s.db.GetContext(ctx, &p,
 		`UPDATE profiles SET name=$1, link=$2, phone=$3 WHERE id=$4 RETURNING *`,

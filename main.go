@@ -9,10 +9,10 @@ import (
 	env "github.com/TV4/env"
 	graceful "github.com/TV4/graceful"
 
-	"github.com/athega/flockflow-server/flockflow"
-	"github.com/athega/flockflow-server/mail"
-	"github.com/athega/flockflow-server/server"
-	"github.com/athega/flockflow-server/storage"
+	"github.com/athega/ailera/ailera"
+	"github.com/athega/ailera/mail"
+	"github.com/athega/ailera/server"
+	"github.com/athega/ailera/storage"
 )
 
 var (
@@ -27,7 +27,7 @@ func main() {
 	graceful.LogListenAndServe(setup(logger, env.DefaultClient), logger)
 }
 
-func setup(logger flockflow.Logger, e env.Client) *http.Server {
+func setup(logger ailera.Logger, e env.Client) *http.Server {
 	var (
 		secretKey = e.Bytes("SECRET_KEY", defaultSecretKey)
 		port      = e.String("PORT", defaultPort)
@@ -41,7 +41,7 @@ func setup(logger flockflow.Logger, e env.Client) *http.Server {
 	}
 
 	store, err := storage.ConnectAndSetupSchema(e.String("DATABASE_URL",
-		"postgres://localhost/flockflow_dev?sslmode=disable",
+		"postgres://localhost/ailera_dev?sslmode=disable",
 	))
 	if err != nil {
 		logger.Printf("Error: %v\n", err)

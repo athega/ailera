@@ -4,14 +4,14 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/athega/flockflow-server/flockflow"
+	"github.com/athega/ailera/ailera"
 )
 
 type Mailer struct {
-	logger flockflow.Logger
+	logger ailera.Logger
 }
 
-func NewMailer(logger flockflow.Logger) flockflow.Mailer {
+func NewMailer(logger ailera.Logger) ailera.Mailer {
 	if logger == nil {
 		logger = log.New(ioutil.Discard, "", 0)
 	}

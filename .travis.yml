@@ -11,7 +11,7 @@ addons:
   postgresql: "9.6"
 
 before_script:
-  - psql -c 'create database flockflow_dev;' -U postgres
+  - psql -c 'create database ailera_dev;' -U postgres
 
 install:
   - echo "nothing to install"

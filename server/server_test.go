@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/athega/flockflow-server/flockflow"
-	"github.com/athega/flockflow-server/mock"
+	"github.com/athega/ailera/ailera"
+	"github.com/athega/ailera/mock"
 )
 
 func TestNew(t *testing.T) {
@@ -39,7 +39,7 @@ func TestServeHTTP(t *testing.T) {
 
 var testSecretKey = []byte("testsecret")
 
-func testServer(logger flockflow.Logger, options ...func(*Server)) *Server {
+func testServer(logger ailera.Logger, options ...func(*Server)) *Server {
 	s := New(logger, mock.NewStorage(logger), mock.NewMailer(logger), testSecretKey)
 
 	s.timeNow = func() time.Time {

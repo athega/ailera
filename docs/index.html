@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>FlockFlow</title>
-		<meta name="description" content="Backend for the FlockFlow iOS application">
+		<title>Ailera</title>
+		<meta name="description" content="Backend for the Ailera iOS application">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 		<style>
 			tt, pre, code { font-family: Consolas, "Liberation Mono", Courier, monospace; background-color: transparent !important; }
@@ -46,8 +46,8 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="page-header">
-						<h1>FlockFlow</h1>
-						<h2><small><p>Backend for the FlockFlow iOS application</p>
+						<h1>Ailera</h1>
+						<h2><small><p>Backend for the Ailera iOS application</p>
 </small></h2>
 					</div>
 				</div>
@@ -90,9 +90,9 @@
 			<code>/login</code>
 		</div>
 		<div class="panel-body">
-			<p>Login to FlockFlow via link in email</p>
+			<p>Login to Ailera via link in email</p>
 
-<pre><code>curl -X POST -d 'to=test@example.com' https://flockflow.herokuapp.com/login
+<pre><code>curl -X POST -d 'to=test@example.com' https://ailera.herokuapp.com/login
 </code></pre>
 
 		</div>
@@ -167,11 +167,11 @@
 			<code>/login{?key}</code>
 		</div>
 		<div class="panel-body">
-			<p>Redirects to the FlockFlow application</p>
+			<p>Redirects to the Ailera application</p>
 
 <p>The link is formatted like this:</p>
 
-<pre><code>flockflow://Login?token=&lt;JWT&gt;
+<pre><code>ailera://Login?token=&lt;JWT&gt;
 </code></pre>
 
 		</div>
@@ -272,7 +272,7 @@
 		<div class="panel-body">
 			<p>Update profile</p>
 
-<pre><code>curl -H 'Authorization: Bearer &lt;JWT&gt;' -X POST -d 'link=http://example.com&amp;name=XYZ&amp;phone=123' https://flockflow.herokuapp.com/profile
+<pre><code>curl -H 'Authorization: Bearer &lt;JWT&gt;' -X POST -d 'link=http://example.com&amp;name=XYZ&amp;phone=123' https://ailera.herokuapp.com/profile
 </code></pre>
 
 		</div>
@@ -384,7 +384,7 @@
 			<div class="panel-body">
 				<div class="lead">
 					<small>
-						<p>Endpoints containing information about the FlockFlow backend</p>
+						<p>Endpoints containing information about the Ailera backend</p>
 
 					</small>
 				</div>

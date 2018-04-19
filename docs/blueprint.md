@@ -1,6 +1,6 @@
-# FlockFlow
+# Ailera
 
-Backend for the FlockFlow iOS application
+Backend for the Ailera iOS application
 
 # Group Client
 
@@ -14,10 +14,10 @@ Endpoints used by the iOS application
 
 ### POST
 
-Login to FlockFlow via link in email
+Login to Ailera via link in email
 
 ```
-curl -X POST -d 'to=test@example.com' https://flockflow.herokuapp.com/login
+curl -X POST -d 'to=test@example.com' https://ailera.herokuapp.com/login
 ```
 
 + Response 202
@@ -30,11 +30,11 @@ curl -X POST -d 'to=test@example.com' https://flockflow.herokuapp.com/login
 
 ### GET
 
-Redirects to the FlockFlow application
+Redirects to the Ailera application
 
 The link is formatted like this:
 ```
-flockflow://Login?token=<JWT>
+ailera://Login?token=<JWT>
 ```
 
 + Response 302 (application/json; charset=utf-8)
@@ -49,7 +49,7 @@ flockflow://Login?token=<JWT>
 Update profile
 
 ```
-curl -H 'Authorization: Bearer <JWT>' -X POST -d 'link=http://example.com&name=XYZ&phone=123' https://flockflow.herokuapp.com/profile
+curl -H 'Authorization: Bearer <JWT>' -X POST -d 'link=http://example.com&name=XYZ&phone=123' https://ailera.herokuapp.com/profile
 ```
 
 + Response 200 (application/json; charset=utf-8)
@@ -67,7 +67,7 @@ curl -H 'Authorization: Bearer <JWT>' -X POST -d 'link=http://example.com&name=X
 
 # Group Info
 
-Endpoints containing information about the FlockFlow backend
+Endpoints containing information about the Ailera backend
 
 ## Status [/__status]
 

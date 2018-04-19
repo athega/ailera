@@ -4,7 +4,7 @@
   unused-packages = true
 
 [metadata.heroku]
-  root-package = "github.com/athega/flockflow-server"
+  root-package = "github.com/athega/ailera"
   go-version = "go1.10"
   install = [ "./..." ]
   ensure = "false"

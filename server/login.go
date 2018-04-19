@@ -25,7 +25,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "flockflow://Login?token="+token, http.StatusFound)
+	http.Redirect(w, r, "ailera://Login?token="+token, http.StatusFound)
 }
 
 func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
@@ -45,10 +45,10 @@ func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.mailer.Send(to,
-		"login@flockflow.herokuapp.com",
-		"Login to FlockFlow",
-		`https://flockflow.herokuapp.com/login?key=`+key,
-		`<a href="https://flockflow.herokuapp.com/login?key=`+key+`">Login to FlockFlow</a>`,
+		"login@ailera.herokuapp.com",
+		"Login to ailera",
+		`https://ailera.herokuapp.com/login?key=`+key,
+		`<a href="https://ailera.herokuapp.com/login?key=`+key+`">Login to ailera</a>`,
 	); err != nil {
 		writeError(w, r, err, http.StatusInternalServerError, meta)
 		return

@@ -1,12 +1,12 @@
 package mail
 
-import "github.com/athega/flockflow-server/flockflow"
+import "github.com/athega/ailera/ailera"
 
 type loggingMailer struct {
-	logger flockflow.Logger
+	logger ailera.Logger
 }
 
-func NewLoggingMailer(logger flockflow.Logger) flockflow.Mailer {
+func NewLoggingMailer(logger ailera.Logger) ailera.Mailer {
 	return &loggingMailer{logger: logger}
 }
 

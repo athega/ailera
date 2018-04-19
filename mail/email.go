@@ -4,14 +4,14 @@ import (
 	sendgrid "github.com/sendgrid/sendgrid-go"
 	mail "github.com/sendgrid/sendgrid-go/helpers/mail"
 
-	"github.com/athega/flockflow-server/flockflow"
+	"github.com/athega/ailera/ailera"
 )
 
 type emailMailer struct {
 	client *sendgrid.Client
 }
 
-func NewEmailMailer(key string) flockflow.Mailer {
+func NewEmailMailer(key string) ailera.Mailer {
 	return &emailMailer{sendgrid.NewSendClient(key)}
 }
 
