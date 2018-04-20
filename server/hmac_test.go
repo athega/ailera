@@ -1,0 +1,21 @@
+package server
+
+import "testing"
+
+func TestCheckMAC(t *testing.T) {
+	for _, tt := range []struct {
+		message []byte
+		mac1    []byte
+		key     []byte
+		want    bool
+	}{
+		{[]byte(""), []byte(""), []byte(""), false},
+		{[]byte("a"), []byte{0xf2, 0xf2, 0x56, 0x6c, 0xc3, 0xef, 0x1e, 0xa5, 0x6, 0xa6, 0x2e, 0x40, 0xb4, 0xe0, 0x7a, 0xa0, 0xe4, 0xee, 0x47, 0x15, 0x70, 0xd, 0x2, 0xdc, 0xb, 0xde, 0xef, 0x81, 0xf3, 0x55, 0x2a, 0x5}, []byte("key1"), true},
+	} {
+		if got := checkMAC(tt.message, tt.mac1, tt.key); got != tt.want {
+			t.Fatalf("checkMAC(%v, %v, %v) = %v, want %v",
+				tt.message, tt.mac1, tt.key, got, tt.want,
+			)
+		}
+	}
+}

@@ -17,10 +17,11 @@ import (
 var (
 	errHTTPSRequired = errors.New("HTTPS required")
 	errInvalidJWT    = errors.New("invalid JWT")
+	errInvalidMAC    = errors.New("invalid MAC")
 	errInvalidEmail  = errors.New("invalid email")
 )
 
-func New(logger ailera.Logger, storage ailera.Store, mailer ailera.Mailer, secretKey []byte) *Server {
+func New(logger ailera.Logger, storage ailera.Store, mailer ailera.Mailer, secretKey, loginKey []byte) *Server {
 	if logger == nil {
 		logger = log.New(ioutil.Discard, "", 0)
 	}
@@ -30,6 +31,7 @@ func New(logger ailera.Logger, storage ailera.Store, mailer ailera.Mailer, secre
 		storage:   storage,
 		mailer:    mailer,
 		secretKey: secretKey,
+		loginKey:  loginKey,
 	}
 
 	s.registerHandlers()
@@ -42,6 +44,7 @@ type Server struct {
 	storage   ailera.Store
 	mailer    ailera.Mailer
 	secretKey []byte
+	loginKey  []byte
 	timeNow   func() time.Time
 	mux       *http.ServeMux
 }

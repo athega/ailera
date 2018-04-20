@@ -12,7 +12,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	if got := New(nil, mock.NewStorage(nil), mock.NewMailer(nil), testSecretKey); got == nil {
+	if got := New(nil, mock.NewStorage(nil), mock.NewMailer(nil), testSecretKey, testLoginKey); got == nil {
 		t.Fatal("New returned nil")
 	}
 }
@@ -38,9 +38,10 @@ func TestServeHTTP(t *testing.T) {
 }
 
 var testSecretKey = []byte("testsecret")
+var testLoginKey = []byte("testlogin")
 
 func testServer(logger ailera.Logger, options ...func(*Server)) *Server {
-	s := New(logger, mock.NewStorage(logger), mock.NewMailer(logger), testSecretKey)
+	s := New(logger, mock.NewStorage(logger), mock.NewMailer(logger), testSecretKey, testLoginKey)
 
 	s.timeNow = func() time.Time {
 		return time.Date(0, time.January, 1, 0, 0, 0, 0, time.UTC)

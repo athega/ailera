@@ -18,6 +18,7 @@ import (
 var (
 	defaultPort              = "3000"
 	defaultSecretKey         = []byte("secret")
+	defaultLoginKey          = []byte("123456")
 	defaultReadTimeout       = 20 * time.Second
 	defaultReadHeaderTimeout = 10 * time.Second
 )
@@ -30,6 +31,7 @@ func main() {
 func setup(logger ailera.Logger, e env.Client) *http.Server {
 	var (
 		secretKey = e.Bytes("SECRET_KEY", defaultSecretKey)
+		loginKey  = e.Bytes("LOGIN_KEY", defaultLoginKey)
 		port      = e.String("PORT", defaultPort)
 		mailer    = mail.NewLoggingMailer(logger)
 	)
@@ -50,7 +52,7 @@ func setup(logger ailera.Logger, e env.Client) *http.Server {
 
 	return &http.Server{
 		Addr:              ":" + port,
-		Handler:           server.New(logger, store, mailer, secretKey),
+		Handler:           server.New(logger, store, mailer, secretKey, loginKey),
 		ReadTimeout:       e.Duration("READ_TIMEOUT", defaultReadTimeout),
 		ReadHeaderTimeout: e.Duration("READ_HEADER_TIMEOUT", defaultReadHeaderTimeout),
 	}

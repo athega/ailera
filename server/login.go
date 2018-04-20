@@ -38,6 +38,17 @@ func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mac1, err := decodeURLEncodedString(r.FormValue("mac"))
+	if err != nil {
+		writeError(w, r, err, http.StatusBadRequest, meta)
+		return
+	}
+
+	if !checkMAC([]byte(to), mac1, s.loginKey) {
+		writeError(w, r, errInvalidMAC, http.StatusUnauthorized, meta)
+		return
+	}
+
 	key, err := s.storage.LoginKey(r.Context(), to)
 	if err != nil {
 		writeError(w, r, err, http.StatusInternalServerError, meta)
