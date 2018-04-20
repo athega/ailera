@@ -3,7 +3,7 @@ package server
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"net/http"
 	"strings"
 )
@@ -17,7 +17,7 @@ func (s *Server) toEmailFromRequest(r *http.Request) (string, error) {
 
 	macString := strings.TrimPrefix(r.Header.Get("Authorization"), "Ailera ")
 
-	mac1, err := decodeBase64EncodedString(macString)
+	mac1, err := decodeHexString(macString)
 	if err != nil {
 		return "", err
 	}
@@ -36,6 +36,6 @@ func checkMAC(message, mac1, key []byte) bool {
 	return hmac.Equal(mac1, hash.Sum(nil))
 }
 
-func decodeBase64EncodedString(s string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(s)
+func decodeHexString(s string) ([]byte, error) {
+	return hex.DecodeString(s)
 }

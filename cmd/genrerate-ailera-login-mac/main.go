@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"flag"
 	"fmt"
 )
@@ -24,6 +24,6 @@ func main() {
 	hash.Write([]byte(msg))
 
 	fmt.Println("HMAC for", msg, "using key", key, "=",
-		base64.StdEncoding.EncodeToString(hash.Sum(nil)),
+		hex.EncodeToString(hash.Sum(nil)),
 	)
 }
