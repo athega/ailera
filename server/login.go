@@ -1,9 +1,6 @@
 package server
 
-import (
-	"net/http"
-	"strings"
-)
+import "net/http"
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -31,21 +28,9 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 func (s *Server) sendLoginEmail(w http.ResponseWriter, r *http.Request) {
 	meta := makeMeta(r, s.now())
 
-	to := r.FormValue("to")
-
-	if !strings.Contains(to, "@") {
-		writeError(w, r, errInvalidEmail, http.StatusBadRequest, meta)
-		return
-	}
-
-	mac1, err := decodeURLEncodedString(r.FormValue("mac"))
+	to, err := s.toEmailFromRequest(r)
 	if err != nil {
-		writeError(w, r, err, http.StatusBadRequest, meta)
-		return
-	}
-
-	if !checkMAC([]byte(to), mac1, s.loginKey) {
-		writeError(w, r, errInvalidMAC, http.StatusUnauthorized, meta)
+		writeError(w, r, err, http.StatusUnauthorized, meta)
 		return
 	}
 
